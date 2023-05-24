@@ -79,7 +79,7 @@ function update() {
       score++;
       catchSound.load();
       catchSound.play();
-      // Handle collision, for example, increment score
+      // Handle collision for example increment score
     }
 
     // Remove fruits that are off the screen
