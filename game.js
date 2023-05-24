@@ -10,6 +10,7 @@ let leftArrowPressed = false;
 let rightArrowPressed = false;
 let score = 0;
 let lives = 5;
+let gameRunning = false;
 
 const catchSound = new Audio('ding.wav');
 
@@ -18,6 +19,8 @@ document.addEventListener('keydown', function (event) {
     leftArrowPressed = true;
   } else if (event.key === 'ArrowRight') {
     rightArrowPressed = true;
+  } else if (event.key === ' ' && !gameRunning) { // Spacebar
+    startGame();
   }
 });
 
@@ -37,6 +40,15 @@ function createFruit() {
   const speed = 2 + elapsedTime * 0.1; // Adjust speed based on elapsed time
   const fruit = new Fruit(x, 0, radius, color, speed);
   fruits.push(fruit);
+}
+
+function startGame() {
+  gameRunning = true;
+  score = 0;
+  lives = 5;
+  startTime = Date.now();
+  fruits.length = 0; // Clear existing fruits
+  update();
 }
 
 function update() {
@@ -77,21 +89,27 @@ function update() {
     }
   }
 
-  // Display score
-  ctx.fillStyle = 'black';
-  ctx.font = '24px Arial';
-  ctx.fillText('Score: ' + score, 10, 30);
+  if (gameRunning) {
+    // Display score
+    ctx.fillStyle = 'black';
+    ctx.font = '24px Arial';
+    ctx.fillText('Score: ' + score, 100, 30);
 
-  // Display lives
-  ctx.fillText('Lives: ' + lives, canvas.width - 120, 30);
+    // Display lives
+    ctx.fillStyle = 'black';
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText('Lives: ' + lives, canvas.width - 10, 30);
 
-  // Game over condition
-  if (lives === 0) {
-    gameOver();
-    return;
+    if (lives === 0) {
+      gameOver();
+      return;
+    }
+
+    requestAnimationFrame(update);
+  } else {
+    displayCenteredMessage('Press Spacebar to Start');
   }
-
-  requestAnimationFrame(update);
 }
 
 function loseLife() {
@@ -99,13 +117,43 @@ function loseLife() {
 }
 
 function gameOver() {
+  gameRunning = false;
+  displayCenteredMessage('Game Over. Press Spacebar to Restart');
   // Game over logic here
   // For example, display a game over message or restart the game
-  // You can add your implementation based on your game requirements
   console.log('Game Over');
+}
+
+function displayCenteredMessage(message) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'black';
+  ctx.font = '18px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+}
+
+function displayScore() {
+  ctx.fillStyle = 'black';
+  ctx.font = '24px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('Score: ' + score, 20, 30);
+}
+
+function displayLives() {
+  ctx.fillStyle = 'black';
+  ctx.font = '24px Arial';
+  ctx.textAlign = 'right';
+  ctx.fillText('Lives: ' + lives, canvas.width - 10, 30);
+}
+
+function displayInitialMessage() {
+  ctx.fillStyle = 'black';
+  ctx.font = '24px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Press Spacebar to Start', canvas.width / 2, canvas.height / 2);
 }
 
 let startTime = Date.now();
 setInterval(createFruit, 1000);
 
-update();
+displayInitialMessage();
